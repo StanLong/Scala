@@ -19,6 +19,8 @@ Scala是一门以java虚拟机（JVM）为运行环境并将**面向对象**和*
 
 ## 入门代码
 
+### 使用notepad++编写
+
 01HelloScala.scala
 
 ```scala
@@ -88,3 +90,57 @@ HelloScala
 ```
 
 说明：可以用 scala 命令执行javac编译出来的class文件，但是不能用 java 执行 scalac 编译出来的class文件
+
+### 使用idea编写
+
+- 新建maven工程
+
+![](./doc/03.png)
+
+![](./doc/04.png)
+
+
+
+![](./doc/05.png)
+
+- 再main下新建一个名为scala目录，并设置为Source ROOT
+
+<img src="./doc/06.png" style="zoom: 80%;" />
+
+![](./doc/07.png)
+
+![](./doc/08.png)
+
+- 加入scala框架支持
+
+![](./doc/09.png)
+
+![](./doc/10.png)
+
+设置完成后，编写scala代码
+
+## Java模拟Scala运行机制
+
+```java
+package com.stanlong.scala.test;
+
+public class TestScala {
+    public static void main(String[] paramArrayOfString) {
+        TestScala$.MODULE$.main(paramArrayOfString);
+    }
+}
+
+final class TestScala$
+{
+    public static final TestScala$ MODULE$;
+    static {
+        MODULE$ = new TestScala$();
+    }
+
+    public void main(String[] args) {
+        System.out.print("HelloScala");
+    }
+
+}
+```
+
