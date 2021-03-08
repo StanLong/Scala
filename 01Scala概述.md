@@ -144,3 +144,10 @@ final class TestScala$
 }
 ```
 
+## 变量
+
+Scala有两种变量，`val`和`var`
+
+`val`类似于Java里的final变量。一旦初始化了，val就不能再被赋值。相反，`var`如同Java里面的非final变量，可以在它的生命周期中被多次赋值。
+
+val 没有线程安全问题，所以效率比较高
