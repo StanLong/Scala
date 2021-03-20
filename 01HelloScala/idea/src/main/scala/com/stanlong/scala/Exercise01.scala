@@ -1,13 +1,22 @@
 package com.stanlong.scala
 
+import scala.util.control.Breaks.{break, breakable}
+
 /**
- * 流程控制
+ * 循环中断
+ * breakable 是一个高阶函数：可以接收函数作为参数的函数
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        var num = 6
-        for(i <- 0 to num){
-            printf("%d + %d = %d\n", i, (num-i), num)
+        var n = 10
+        breakable{
+            while (n < 20){
+                n = n+1
+                if(n==18){
+                    break()
+                }
+                println(n)
+            }
         }
     }
 }
