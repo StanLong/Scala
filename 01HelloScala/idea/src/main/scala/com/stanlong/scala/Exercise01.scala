@@ -1,16 +1,21 @@
 package com.stanlong.scala
 
-import scala.io.StdIn
-
 /**
- * 异常注解
+ * 类和对象
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        print("请输入金字塔的层级:")
-        var num = StdIn.readInt()
-        for(i <- 1 to num){
-            println(" " * (num-i) + "*" * ((2 * i)-1))
-        }
+        val cat = new Cat()
+        cat.name = "小白猫"
+        cat.age = 10
+        cat.color = "白色"
+        println("ok~")
+        printf("\n小猫的信息如下: %s %d %s", cat.name, cat.age, cat.color)
+    }
+
+    class Cat{
+        var name:String=""
+        var age:Int= 0
+        var color = ""
     }
 }
