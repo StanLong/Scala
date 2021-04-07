@@ -1,21 +1,26 @@
 package com.stanlong.scala
 
 /**
- * 类和对象
+ * 计算字符串中所有字母的Unicode代码的乘积
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        val cat = new Cat()
-        cat.name = "小白猫"
-        cat.age = 10
-        cat.color = "白色"
-        println("ok~")
-        printf("\n小猫的信息如下: %s %d %s", cat.name, cat.age, cat.color)
+        val person = new Person("Stanlong", inAge = 20)
+        println(person)
+
     }
 
-    class Cat{
-        var name:String=""
-        var age:Int= 0
-        var color = ""
+
+
+}
+
+// 构造器快速入门
+// 创建Person对象的同时初始化对象的age属性和name属性值
+class Person(inName:String, inAge:Int){
+    var name=inName
+    var age = inAge
+
+    override def toString: String = {
+        "name=" + this.name + "\t age=" + this.age
     }
 }
