@@ -1,15 +1,24 @@
 package com.stanlong.scala
 
 /**
- * 继承
+ * 多态
  */
-object Exercise01{ // 继承App后，就可以直接在这个类中执行代码，不需要再写main入口
+object Exercise01{
     def main(args: Array[String]): Unit = {
         val student = new Student
-        student.name = "StanLong"
-        student.age = 27
-        student.studying()
-        student.showInfo()
+        val emp = new Emp
+        test(student)
+        test(emp)
+    }
+
+    def test(person: Person):Unit = {
+        if (person.isInstanceOf[Student]){
+            person.asInstanceOf[Student].studying()
+        }else if(person.isInstanceOf[Emp]){
+            person.asInstanceOf[Emp].working()
+        }else{
+            println("不知道是啥类型")
+        }
     }
 }
 
@@ -27,6 +36,12 @@ class Person(){
 
 class Student extends Person{
     def studying(): Unit = {
-        println(this.name + " 学习scala...")
+        println("学习scala...")
+    }
+}
+
+class Emp extends Person{
+    def working(): Unit = {
+        println("用scala搬砖...")
     }
 }
