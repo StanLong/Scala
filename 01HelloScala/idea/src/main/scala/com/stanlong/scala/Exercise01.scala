@@ -1,28 +1,19 @@
 package com.stanlong.scala
 
 /**
- * 只有主构造器可以调用父类的构造器。辅助构造器不能直接调用父类的构造器
+ * val 只能重写另一个抽象的var属性
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        val stu = new Student("StanLong")
-        stu.printName()
+        val student = new Student
+        print(student.name)
     }
 }
 
-class Person( pname : String )  {
-    var name : String = pname
-    def printName() {
-        println("Person printName() " + name)
-    }
+abstract class Person()  {
+    var name : String // 抽象字段不能被初始化，否则无法重写
 }
 
-class Student(studentname : String ) extends  Person(studentname)  {
-
-    var sno : Int = 20
-
-    override def printName() {
-        println("Student printName() " + name)
-        super.printName()
-    }
+class Student() extends Person()  {
+    override var name = "StanLong"
 }
