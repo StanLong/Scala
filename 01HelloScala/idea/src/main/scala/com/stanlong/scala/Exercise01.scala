@@ -1,28 +1,63 @@
 package com.stanlong.scala
 
 /**
- * 如果一个类继承了抽象类，则它必须实现抽象类的所有抽象方法和抽象属性，除非它自己也声明为abstract类
+ * 叠加特质
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        println("ok100")
+        // 同时混入多个特质，称之为叠加
+        // Scala在叠加特质的时候，会首先从后面的特质开始执行
+        // Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+        val mysql = new MySQL with DB with File
+        // 修改在测试一下。。
+        //val mysql = new MySQL with File with DB
+
+        // 向数据库插入数据
+        // 向文件插入数据
+        // 向文件向数据库插入数据
+        mysql.insert(888)
+
+        // 打印结果
+        //Operate...
+        //Data
+        //DB
+        //File
+        //向文件
+        //向数据库
+        //插入数据 = 888
 
     }
 }
 
-abstract class Animal{
-    var name : String //抽象的字段
-    var age : Int // 抽象的字段
-    var color : String = "black"
-    //我们发现这个父类的方法，被子类继承后，没有什么用处，但是我们还
-    //希望子类将来必须有这个cry方法,但是目前cry 不用写，声明为抽象的方法
-    def cry()
+trait Operate {
+    println("Operate...")
+    def insert(id : Int)
 }
-
-class Dog extends Animal{
-    var name : String = _
-    var age : Int = _
-    def cry(): Unit = {
-        println("小狗汪汪叫唤..")
+trait Data extends Operate {
+    println("Data")
+    override  def insert(id : Int): Unit = {
+        println("插入数据 = " + id)
     }
 }
+trait DB extends Data {
+    println("DB")
+    override def insert(id : Int): Unit = {
+        println("向数据库")
+        //Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+        //这里就是找Data4的insert
+        super.insert(id)
+    }
+}
+trait File extends  Data {
+    println("File")
+    override def insert(id : Int): Unit = {
+        println("向文件")
+        //Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+        //这里就是找DB4的insert
+        super.insert(id)
+    }
+}
+class MySQL {
+
+}
+
