@@ -147,3 +147,225 @@ class MySQL {
 }
 ```
 
+# 在特质中重写抽象方法
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 在特质中重写抽象方法
+ */
+object Exercise01 {
+    def main(args: Array[String]): Unit = {
+        println("123")
+    }
+}
+trait Operate {
+    def insert(id : Int)
+}
+trait File extends Operate {
+    // 如果在自特质中重写了父特质的抽象方法，但是同时调用super
+    // 这时我们的方法不是完全实现，因此需要声明为 abstract override
+    //
+    abstract  override def insert( id : Int ): Unit = {
+        println("将数据保存到文件中..")
+        super.insert(id)
+    }
+}
+```
+
+# 富接口
+
+富接口：即该特质中既有抽象方法，又有非抽象方法
+
+```scala
+trait Operate {
+    def insert( id : Int ) //抽象方法
+    def pageQuery(pageno:Int, pagesize:Int): Unit = { // 非抽象方法
+        println("分页查询")
+    }
+}
+```
+
+# 特质中的具体字段
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 特质中的具体字段
+ *
+ * 特质中可以定义具体字段，如果初始化了就是具体字段，如果不初始化就是抽象字段。
+ * 混入该特质的类就具有了该字段，字段不是继承，而是直接加入类，成为自己的字段。
+ */
+object Exercise01 {
+    def main(args: Array[String]): Unit = {
+        var mysql = new MySQL with DB
+        //通过反编译，可以看到 opertype
+        println(mysql.opertype)
+    }
+}
+
+trait Operate {
+
+    //抽象的字段
+    var opertype : String
+    //抽象的方法
+    def insert()
+}
+trait DB extends  Operate {
+    var opertype : String = "insert"
+
+    def insert(): Unit = {
+
+    }
+}
+class MySQL {
+
+}
+```
+
+# 特质构造顺序
+
+1. 调用当前类的超类构造器
+2. 第一个特质的父特质构造器
+3. 第一个特质构造器
+4. 第二个特质构造器的父特质构造器, 如果已经执行过，就不再执行
+5. 第二个特质构造器
+6. .......重复4,5的步骤(如果有第3个，第4个特质)
+7. 当前类构造器
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 特质构造顺序
+ */
+object Exercise01 {
+    def main(args: Array[String]): Unit = {
+        val ff1 = new FF()
+        println(ff1) //输出的内容如下：
+        //    E...
+        //    A...
+        //    B....
+        //    C....
+        //    D....
+        //    F....
+
+        println("--------------------------")
+        val ff2 = new KK() with CC with DD
+        println(ff2) //输出的内容如下：
+        //    E...
+        //    K....
+        //    A...
+        //    B....
+        //    C....
+        //    D....
+    }
+}
+
+trait AA {
+    println("A...")
+}
+
+trait BB extends  AA {
+    println("B....")
+}
+
+trait CC extends  BB {
+    println("C....")
+}
+trait DD extends  BB {
+    println("D....")
+}
+
+class EE {
+    println("E...")
+}
+class FF extends EE with CC with DD {
+    println("F....")
+}
+
+class KK extends EE {
+    println("K....")
+}
+```
+
+# 扩展类的特质
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 扩展类的特质
+ */
+object Exercise01 {
+    def main(args: Array[String]): Unit = {
+        val unhappyException = new UnhappyException
+        unhappyException.getMessage()
+    }
+}
+
+/**
+ * LoggedException 继承了 Exception
+ * LoggedException 就可以使用 Exception 功能
+ */
+trait LoggedException extends Exception{
+    def log(): Unit ={
+        println(getMessage()) // 方法来自于Exception类
+    }
+}
+
+// 所有混入该特质的类，会自动成为那个特质所继承的超类的子类
+// UnhappyException 就是Exception的子类.
+class UnhappyException extends LoggedException{
+    // 已经是Exception的子类了，所以可以重写方法
+    override def getMessage = "错误消息！"
+}
+```
+
+# 自身类型
+
+自身类型：主要是为了解决特质的循环依赖问题，同时可以确保特质在不扩展某个类的情况下，依然可以做到限制混入该特质的类的类型。
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 扩展类的特质
+ */
+object Exercise01 {
+    def main(args: Array[String]): Unit = {
+    }
+}
+
+//Logger就是自身类型特质
+trait Logger{
+    // 明确告诉编译器，我就是Exception,如果没有这句话，下面的getMessage不能调用
+    this: Exception =>
+    def log(): Unit ={
+        // 既然我就是Exception, 那么就可以调用其中的方法
+        println(getMessage)
+    }
+}
+
+//下面会报错 llegal inheritance, self-type Console does not conform to Exception
+//分析原因
+//1. Logger 已经是Exception了
+//2. 但是这里Console 并没有说明是Excepton的子类，因此出现了
+// self-type Console does not conform to Exception，即自身类型的约束。
+//class Console extends  Logger { //错误×
+//
+//}
+
+// 如果我们需要混入Logger这种自身类型的特质，需要让该类也继承Excetion
+// 这样Console 才能混入Logger,保证都是Excetpion类型
+
+// 此处必须继承Exception类，否则无法混入logger特质
+class Console extends Exception with Logger {
+
+}
+```
+
+
+
