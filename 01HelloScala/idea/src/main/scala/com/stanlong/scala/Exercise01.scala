@@ -2,6 +2,9 @@ package com.stanlong.scala
 
 /**
  * 嵌套类-》类型投影
+ * 类型投影主要用在有外部类和内部类，并且外部类有方法是需要传入内部类作参数的时候用的
+ * 而这个传入的参数要求除了可以是自己这个对象的内部类，也可以是其他实例对象的内部类，只要都是实例化这个类就行了。
+ * 格式是 Outter#Inner
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
@@ -11,14 +14,16 @@ object Exercise01 {
         val inner1 = new outer1.ScalaInnerClass()
         val inner2 = new outer2.ScalaInnerClass()    //创建静态内部类对象
 
-        //说明下面调用test 的 正确和错误的原因：
-        //1.Java中的内部类从属于外部类,因此在java中 inner.test(inner2) 就可以，因为是按类型来匹配的。
-        //2 Scala中内部类从属于外部类的对象，所以外部类的对象不一样，创建出来的内部类也不一样，无法互换使用
-        //3. 比如你使用ideal 看一下在inner1.test()的形参上，
-        // 它提示的类型是 outer1.ScalaOuterClass, 而不是ScalaOuterClass
+        /**
+         * Scala中的内部类 必须依赖于外部类的实例 而外部类的实例各不相同 所以被之为这种对于外部类的依赖为"路径依赖"
+         * 所以不同的路劲代表不同的类型, 即这里inner1和inner2并不是同一个类型
+         */
 
         inner1.test(inner1) // ok
         // inner1.test(inner2) // 错误
+
+        inner1.test2(inner1) // ok
+        inner1.test2(inner2) // ok
     }
 }
 
@@ -28,12 +33,10 @@ class ScalaOuterClass {
         def test( ic : ScalaInnerClass ) : Unit = {
             System.out.println(ic);
         }
-    }
-}
 
-object ScalaOuterClass {
-    //伴生对象
-    class ScalaStaticInnerClass {
-        //静态内部类
+        //类型投影
+        def test2(ScalaInnerClass: ScalaOuterClass#ScalaInnerClass) : Unit = {
+            System.out.println(ScalaInnerClass);
+        }
     }
 }
