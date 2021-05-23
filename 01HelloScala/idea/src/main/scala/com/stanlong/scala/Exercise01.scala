@@ -1,26 +1,16 @@
 package com.stanlong.scala
 
 /**
- * 隐式类
+ * List
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
-        // DB 会对应生成隐式类，当在该隐式类的作用域范围创建MySql 类的实例时，该隐式类就会生效
-        // 隐式类必须被定义在“类”或“伴生对象”或“包对象”里，即隐式类不能是 顶级的
-        implicit class DB(val m: MySql){ // 其所带的构造参数有且只能有一个
-            def addSuffix():String={
-                m + "scala"
-            }
-        }
+        // 在scala中List默认为不可变的集合
+        // 如果需要使用可变List， 则使用ListBuffer
+        val list01 = List(1, 2, 3) //创建时，直接分配元素 List 中可以放任何数据类型
+        println(list01)
+        val list02 = Nil  //空集合
+        println(list02)
 
-        val mySql = new MySql
-        mySql.sayOK()
-        mySql.addSuffix()
-    }
-}
-
-class MySql{
-    def sayOK(): Unit ={
-        println("Ok~")
     }
 }
