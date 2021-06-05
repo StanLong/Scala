@@ -1,56 +1,43 @@
 package com.stanlong.scala
 
 /**
- * 扫描
- * 扫描，即对某个集合的所有元素做fold操作，但是会把产生的所有中间结果放置于一个集合中保存
- * scan 默认等于 scanleft
+ * 视图
+ * Stream的懒加载特性，也可以对其他集合应用view方法来得到类似的效果，具有如下特点：
+ * view方法产出一个总是被懒执行的集合。
+ * view不会缓存数据，每次都要重新计算，比如遍历View时
  */
 object Exercise01 {
     def main(args: Array[String]): Unit = {
+        def multiple(num: Int): Int = {
+            num
+        }
 
-        //5 (1,2,3,4,5) =>(5,4,2,-1,-5,-10)
-        // 执行步骤
-        // 5
-        // 5-1 = 4
-        // 5-1-2 = 2
-        // 5-1-2-3 = -1
-        // 5-1-2-3-4 = -5
-        // 5-1-2-3-4-5 = -10
-        val i7 = (1 to 5).scan(5)(minus) //IndexedSeq[Int]
-        println(i7)
-        // Vector(5, 4, 2, -1, -5, -10)
+        def eq(i: Int): Boolean = {
+            //如果i这个数字倒序后，和本身相同，则返回true
+            i.toString.equals(i.toString.reverse)
+        }
 
-        val i8 = (1 to 5).scanLeft(5)(minus) //IndexedSeq[Int]
-        println(i8)
-        // Vector(5, 4, 2, -1, -5, -10)
+        //说明: 没有使用view
+        //1. 对 1-100 进行遍历
+        //2. map(multiple) 对 1-100进行map映射操作，这里其实就是简单的复制一份
+        //3. filter(eq) 使用eq方法对新的集合进行过滤，条件为i.toString.equals(i.toString.reverse)
+        val viewSquares1 = (1 to 100).map(multiple).filter(eq)
 
-        // 执行步骤, 从右边开始看
-        // 5
-        // 5-5 = 0
-        // 4-(5-5) = 4
-        // 3-(4-(5-5)) = -1
-        // 2-(3-(4-(5-5))) = 3
-        // 1-(2-(3-(4-(5-5)))) = -2
-        val i6 = (1 to 5).scanRight(5)(minus) //IndexedSeq[Int]
-        println(i6)
-        // Vector(-2, 3, -1, 4, 0, 5)
+        println(viewSquares1)
+        for (x <- viewSquares1) {
+            print(x + "，")
+        }
 
-        // 执行步骤
-        //5
-        //5+1 = 6
-        //5+1+2 = 8
-        //5+1+2+3 = 11
-        //5+1+2+3+4 = 15
-        //5+1+2+3+4+5 = 20
-        val i9 = (1 to 5).scanLeft(5)(add) //IndexedSeq[Int]
-        println(i9)
-        // Vector(5, 6, 8, 11, 15, 20)
-    }
-    def minus( num1 : Int, num2 : Int ) : Int = {
-        num1 - num2
-    }
+        println("\n-----------------------------")
+        //使用view
+        //1. 使用和前面一样，只是使用了view
+        //2. view方法产出一个总是被懒执行的集合
+        //3. view不会缓存数据，每次都要重新计算
+        val viewSquares2 = (1 to 100).view.map(multiple).filter(eq)
 
-    def add( num1 : Int, num2 : Int ) : Int = {
-        num1 + num2
+        println(viewSquares2)
+        for (x <- viewSquares2) {
+            print(x + "，")
+        }
     }
 }
