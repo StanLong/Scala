@@ -29,7 +29,9 @@ class CustomerView {
                 case '1' => {
                     this.add()
                 }
-                case '2' => println("修 改 客 户")
+                case '2' => {
+                    this.update()
+                }
                 case '3' => {
                     this.delete()
                 }
@@ -80,9 +82,36 @@ class CustomerView {
     }
 
     // 修改
-//    def update(): Unit ={
-//
-//    }
+    def update(): Unit ={
+        println("---------------------修改客户---------------------")
+        println("请选择待修改客户编号(-1退出)：")
+        val id = StdIn.readInt()
+        if(id == -1){
+            println("---------------------退出---------------------")
+            return
+        }
+        val customer = customerService.findCustomerById(id)
+        print(customer)
+        println()
+        print("姓名：")
+        val name = StdIn.readLine()
+        print("性别：")
+        val gender = StdIn.readChar()
+        print("年龄：")
+        val age = StdIn.readShort()
+        print("电话：")
+        val tel = StdIn.readLine()
+        print("邮箱：");
+        val email = StdIn.readLine()
+
+        val customerNew = new Customer(id, name, gender, age, tel, email)
+        val flag = customerService.update(customerNew)
+        if(flag){
+            println("---------------------修改成功---------------------")
+            return
+        }
+        println("---------------------修改失败---------------------")
+    }
 
     // 删除
     def delete(): Unit ={
@@ -102,7 +131,5 @@ class CustomerView {
             }
         }
         println("---------------------删除没有完成---------------------")
-
-
     }
 }

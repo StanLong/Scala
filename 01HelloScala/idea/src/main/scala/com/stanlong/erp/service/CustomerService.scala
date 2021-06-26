@@ -22,12 +22,11 @@ class CustomerService {
         // 设置id
         customerId += 1
         customer.id = customerId
-
         customers.append(customer)
         true
     }
 
-    // 查找单个用户
+    // 查找单个用户在ArrayBuffer的下标索引
     def findById(id:Int): Int ={
         var index = -1 // 如果找到就返回对应的id，没找到就返回-1
         breakable{
@@ -42,10 +41,18 @@ class CustomerService {
         index
     }
 
+    // 查找单个用户
+    def findCustomerById(id:Int):Customer={
+        val customer = customers(id-1)
+        return customer
+    }
+
     // 修改客户
-//    def update(customer: Customer):Boolean={
-//
-//    }
+    def update(customer: Customer):Boolean={
+        val id = customer.id
+        customers(id-1) = customer
+        true
+    }
 
 
     // 删除
