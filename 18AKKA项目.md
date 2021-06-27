@@ -40,3 +40,142 @@ https://avsox.website/cn
 2. ActorRef:可以理解成是Actor的代理或者引用。消息是通过ActorRef来发送,而不能通过Actor 发送消息，通过哪个ActorRef 发消息，就表示把该消息发给哪个Actor
 3. 消息发送到Dispatcher Message (消息分发器)，它得到消息后，会将消息进行分发到对应的MailBox。(注: Dispatcher Message 可以理解成是一个线程池, MailBox 可以理解成是消息队列，可以缓冲多个消息，遵守FIFO)
 4. Actor 可以通过 receive方法来获取消息，然后进行处理。
+
+## Actor模型快速入门
+
+![](./doc/22.png)
+
+**使用Maven的方式来构建项目**
+
+1. 创建项目 new->new Project -> 选择Maven
+
+   ![](./doc/23.png)
+
+![](./doc/24.png)
+
+![](./doc/25.png)
+
+2. 配置maven依赖
+
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+   
+       <groupId>org.example</groupId>
+       <artifactId>Akka</artifactId>
+       <version>1.0-SNAPSHOT</version>
+   
+       <!-- 定义一下常量 -->
+       <properties>
+           <encoding>UTF-8</encoding>
+           <scala.version>2.11.8</scala.version>
+           <scala.compat.version>2.11</scala.compat.version>
+           <akka.version>2.4.17</akka.version>
+       </properties>
+   
+       <dependencies>
+           <!-- 添加scala的依赖 -->
+           <dependency>
+               <groupId>org.scala-lang</groupId>
+               <artifactId>scala-library</artifactId>
+               <version>${scala.version}</version>
+           </dependency>
+   
+           <!-- 添加akka的actor依赖 -->
+           <dependency>
+               <groupId>com.typesafe.akka</groupId>
+               <artifactId>akka-actor_${scala.compat.version}</artifactId>
+               <version>${akka.version}</version>
+           </dependency>
+   
+           <!-- 多进程之间的Actor通信 -->
+           <dependency>
+               <groupId>com.typesafe.akka</groupId>
+               <artifactId>akka-remote_${scala.compat.version}</artifactId>
+               <version>${akka.version}</version>
+           </dependency>
+       </dependencies>
+   
+       <!-- 指定插件-->
+       <build>
+           <!-- 指定源码包和测试包的位置 -->
+           <sourceDirectory>src/main/scala</sourceDirectory>
+           <testSourceDirectory>src/test/scala</testSourceDirectory>
+           <plugins>
+               <!-- 指定编译scala的插件 -->
+               <plugin>
+                   <groupId>net.alchim31.maven</groupId>
+                   <artifactId>scala-maven-plugin</artifactId>
+                   <version>3.2.2</version>
+                   <executions>
+                       <execution>
+                           <goals>
+                               <goal>compile</goal>
+                               <goal>testCompile</goal>
+                           </goals>
+                           <configuration>
+                               <args>
+                                   <arg>-dependencyfile</arg>
+                                   <arg>${project.build.directory}/.scala_dependencies</arg>
+                               </args>
+                           </configuration>
+                       </execution>
+                   </executions>
+               </plugin>
+   
+               <!-- maven打包的插件 -->
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-shade-plugin</artifactId>
+                   <version>2.4.3</version>
+                   <executions>
+                       <execution>
+                           <phase>package</phase>
+                           <goals>
+                               <goal>shade</goal>
+                           </goals>
+                           <configuration>
+                               <filters>
+                                   <filter>
+                                       <artifact>*:*</artifact>
+                                       <excludes>
+                                           <exclude>META-INF/*.SF</exclude>
+                                           <exclude>META-INF/*.DSA</exclude>
+                                           <exclude>META-INF/*.RSA</exclude>
+                                       </excludes>
+                                   </filter>
+                               </filters>
+                               <transformers>
+                                   <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                       <resource>reference.conf</resource>
+                                   </transformer>
+                                   <!-- 指定main方法 -->
+                                   <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                       <mainClass>xxx</mainClass>
+                                   </transformer>
+                               </transformers>
+                           </configuration>
+                       </execution>
+                   </executions>
+               </plugin>
+           </plugins>
+       </build>
+   </project>
+   ```
+
+3. 配置scala源码包
+
+   ![](./doc/26.png)
+
+   并将两个源码包标记成Source Root
+
+   ![](./doc/27.png)
+
+   当修改后，第一次速度比较慢，因为maven 需要resolve 包的依赖，要下载相关的包 
+
+   **注意：**需要如图勾选，update snapshots, 而且不需要联网,如果使用maven解决依赖后，仍然pom.xml 有误，则只需要重启下idea, 或者 动一下 pom.xml 文件(不用改)，重新保存即可.
+
+   ![](./doc/28.png)
