@@ -176,7 +176,7 @@ https://avsox.website/cn
 
    当修改后，第一次速度比较慢，因为maven 需要resolve 包的依赖，要下载相关的包 
 
-   **注意：**需要如图勾选，update snapshots, 而且不需要联网,如果使用maven解决依赖后，仍然pom.xml 有误，则只需要重启下idea, 或者 动一下 pom.xml 文件(不用改)，重新保存即可.
+   **注意** :需要如图勾选，update snapshots, 而且不需要联网,如果使用maven解决依赖后，仍然pom.xml 有误，则只需要重启下idea, 或者 动一下 pom.xml 文件(不用改)，重新保存即可.
 
    ![](./doc/28.png)
 
@@ -194,7 +194,7 @@ https://avsox.website/cn
        // type Receive = PartialFunction[Any, Unit]
        override def receive: Receive = {
            case "hello" => println("收到Hello， 回应Hello too:)")
-           case "ok" => println("收到ok， 回鹰ok too：)")
+           case "ok" => println("收到ok， 回应ok too：)")
            case "exit" => {
                println("接收到exit指令，退出系统")
                context.stop(self) // 停止actorf
@@ -238,4 +238,87 @@ https://avsox.website/cn
    7) aActorRef !  "hello", 表示把hello消息发送到A Actor 的mailbox （通过Dispatcher Message 转发）
    ```
 
-   
+
+## Actor间通讯
+
+目录结构
+
+![](./doc/29.png)
+
+**AActor**
+
+```scala
+package com.stanlong.akka.actors
+
+import akka.actor.{Actor, ActorRef}
+
+class AActor(actorRef : ActorRef) extends Actor{
+
+    val bActorRef:ActorRef = actorRef
+
+    override def receive: Receive = {
+        case "start" => {
+            println("Hi")
+            self ! "Hi"
+        }
+        case "Hi" => {
+            // 给BActor发出消息
+            // 这里需要持有BActor的引用（BActorRef）
+            println("Hello")
+            Thread.sleep(1000)
+            bActorRef ! "Hello"
+        }
+
+        case "How are you" =>{
+            println("I'm fine, Thank you")
+            bActorRef ! "I'm fine, Thank you"
+        }
+    }
+}
+```
+
+**BActor**
+
+```scala
+package com.stanlong.akka.actors
+
+import akka.actor.Actor
+
+class BActor extends Actor{
+    override def receive: Receive = {
+        case "Hello" =>{
+
+            // 通过sender() 可以获取到发送消息的actorRef
+            println("How are you")
+            Thread.sleep(1000)
+            sender() ! "How are you"
+        }
+
+    }
+}
+```
+
+**ActorGame**
+
+```scala
+package com.stanlong.akka.actors
+
+import akka.actor.{ActorRef, ActorSystem, Props}
+
+object ActorGame extends App{
+
+    // 创建ActorSystem
+    val actoryfactory = ActorSystem("actorfactory")
+
+    // 创建BActorRef
+    val bActorRef:ActorRef = actoryfactory.actorOf(Props[BActor], "bActor")
+
+    // 创建AActorRef, AActor有参数，需要用new的形式实现反射
+    val aActorRef:ActorRef = actoryfactory.actorOf(Props(new AActor(bActorRef)), "aActor")
+
+    // aActor 说话
+    aActorRef ! "start"
+
+}
+```
+
