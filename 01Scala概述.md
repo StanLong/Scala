@@ -2,19 +2,15 @@
 
 ## 定义
 
-Scala是一门以java虚拟机（JVM）为运行环境并将**面向对象**和**函数式编程**的最佳特性结合在一起
-
-的静态类型编程语言
+Scala是一门以java虚拟机（JVM）为运行环境并将**面向对象**和**函数式编程**的最佳特性结合在一起的静态类型编程语言
 
 ## 安装
 
 - Scala需要Java运行时库，安装Scala需要**首先安装**JVM虚拟机**并配置好**，推荐安装JDK1.8
-- 在http://www.scala-lang.org/ 下载Scala2.11.8程序安装包
+- 在http://www.scala-lang.org/ 下载Scala2.12.4程序安装包
 - 配置Jdk的环境变量
-- 配置SCALA_HOME
-   SCALA_HOME= D:\program\scala-2.11.8
-- 将Scala安装目录下的bin目录加入到PATH环境变量
-   在PATH变量中添加：%SCALA_HOME%\bin
+- 配置SCALA_HOME= D:\program\scala-2.11.8
+- 将Scala安装目录下的bin目录加入到PATH环境变量，在PATH变量中添加：%SCALA_HOME%\bin
 - 在终端中输入“scala”命令打开scala解释器
 
 ## 入门代码
@@ -37,10 +33,9 @@ object HelloScala{
 2. HelloScala 就是对象的名字，底层真正对应的类名是 HelloScala$
 3. 编译后生成了两个文件 HelloScala$.class， HelloScala.class。 
 scala 现从 HelloScala的main开始执行， 然后调用 HelloScala$ 的方法， 即执行了这段代码 Predef..MODULE$.println("HelloScala");
-
 4. def 表示是一个方法，是一个关键字
 5. main表示方法名，程序执行的入口
-6. args:Array[String] 表示形参，scala的特点是将参数写在前面，类型写在后面
+6. args 表示形参，scala的特点是将参数写在前面，类型写在后面
 7. Array[String] 表示参数类型是个数组
 8. :Unit= 表示该函数的返回值为空，类似于Java中的void
 ```
