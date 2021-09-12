@@ -1,24 +1,50 @@
 package com.stanlong.scala
 
 /**
- * 伴生对象: 不使用 static 关键字并实现 static 功能
+ * 空类型
+ * Unit
+ * null
+ * Nothing
  */
 object Exercise01 {
     def main(args: Array[String]): Unit ={
-        val student1 = new Student("张三", 25)
-        val student2 = new Student("张三", 20)
-        student1.printInfo()
-        student2.printInfo()
-    }
-}
+        // 1. Unit
+        def m1():Unit={
+            println("m1被调用执行")
+        }
+        val a = m1()
+        println("a: " + a) // 打印结果 a: ()
 
-class Student(name:String, age:Integer){
-    def printInfo(): Unit ={
-        println(name + " " + age + " " + Student.school)
-    }
-}
+        // 2. null
+        // val b:Int = null // 报错： an expression of type Null is ineligible for implicit conversion
+        var student = new Student("张三", 20)
+        student = null
+        println(student) // 打印结果 null
 
-// object Student 为 class Student 的伴生对象，里面的各种属性、方法class Student都可以调用
-object Student{
-    val school:String = "北京大学" //  class Student 中只需要初始化一次的对象都可以放到伴生对象里
+        // 3. Nothing
+        def m2(n:Int) :Nothing = {
+            throw new NullPointerException
+        }
+
+        val b:Int = m2(2)
+        println("b: " + b) // 打印结果： Exception in thread "main" java.lang.NullPointerException
+
+        // 说明： Nothing是任何类型的子类型，如果有逻辑判断，函数方法可以做如下修改
+        def m3(n:Int):Int={
+            if(n == 0){
+                throw new NullPointerException
+            }else{
+                n
+            }
+        }
+
+        val c:Int = m3(2)
+        println("c: " + c) // 打印结果：2
+
+
+    }
+
+    class Student(name:String, age:Int){
+
+    }
 }
