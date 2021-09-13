@@ -1,40 +1,24 @@
 package com.stanlong.scala
-import scala.util.control.Breaks.{break, breakable}
 
 /**
- *  while循环
- *  while
- *  do..while
- *  breakable 循环中断
+ * 匿名函数案例
  */
 object Exercise01 {
     def main(args: Array[String]): Unit ={
-        // while
-        var a = 10
-        while( a>= 1){
-            println("this is a while loop: " + a)
-            a = a-1
+        // 定义一个二元运算函数，只操作1和2两个数，但是具体运算通过参数传入
+        def dealFunOneAndTwo(fun:(Int, Int) => Int):Int={
+            fun(1,2)
         }
 
-        // do..while
-        var b = 10
-        do{
-            println("this is b while loop: " + b)
-            b = b-1
-        }while(b>0)
+        val add = (a:Int, b:Int) => a + b
+        val minus = (a:Int, b:Int) => a-b
 
-        // breakable 循环中断
-        var n = 10
-        breakable{
-            while (n < 20){
-                n = n+1
-                if(n==18){
-                    break()
-                }
-                println(n)
-            }
-        }
+        println(dealFunOneAndTwo(add))
+        println(dealFunOneAndTwo(minus))
 
+        // 匿名函数简化
+        println(dealFunOneAndTwo(_+_))
+        println(dealFunOneAndTwo(_-_))
     }
 
 }
