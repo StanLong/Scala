@@ -1,35 +1,39 @@
 package com.stanlong.scala
 
+
 /**
- * 柯里化
- * 把一个参数列表的多个参数，变成多个参数列表
- * 即把 fun(1,2,3,4)  变成 fun(1)(2)(3)(4)
+ * 控制抽象
+ * 1. 值调用：把计算后的值传递过去
+ * 2. 名调用：把代码传递过去
  */
 object Exercise01 {
     def main(args: Array[String]): Unit ={
-        def add(a:Int, b: Int):Int = {
-            a + b
+        // 1. 传值参数
+        def f0(a:Int):Unit={
+            println("a: " + a)
         }
+        f0(20)
 
-        // 1. 考虑固定一个加数的场景
-        def addByFour(b:Int):Int={
-            4 + b
+        def f1():Int={
+            println("f1调用")
+            12
         }
+        f0(f1())
 
-        // 2. 当固定加数改变时，扩展将固定加数作为参数传入，但是是作为"第一层参数"传入
-        def addByA(a:Int): Int => Int = {
-            def addB(b:Int):Int = {
-                a + b  // 闭包
-            }
-            addB
+        // 2. 传名参数
+        def f2(a: => Int): Unit ={ // => Int 表示一段代码块，代码块的返回值是 Int
+            println("a: " + a)
         }
+        f2(23)
+        // 或者
+        f2({23})
+        // 或者
+        f2({
+            println("这是一个代码块")
+            0
+        })
 
-        // 闭包采用柯里化的方式来写
-        def addCurrying(a:Int)(b:Int):Int={
-            a + b
-        }
-
-        println(addCurrying(10)(20))
+        f2(f1()) // 说明 a 调用的几次，f1() 会跟着调用几次
     }
 
 }
