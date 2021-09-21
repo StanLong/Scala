@@ -1,44 +1,47 @@
 package com.stanlong.scala
 
 /**
- * 构造器参数
- *
+ * 继承
  */
 object HelloScala {
     def main(args: Array[String]): Unit = {
-        val student = new Student()
-        student.student()
-
-        val student1 = new Student("zhangsan")
-        val student2 = new Student("lisi", 20)
+        val student1 = new Student("zhangsan", 18)
+        val student2 = new Student("lisi", 19, "1142061140")
+        student1.showInfo()
+        student2.showInfo()
     }
 }
 
-// 定义一个类
-class Student(){
-    // 定义属性
-    var name: String = _
-    var age: Int = _
 
-    println("1. 主构造器方法被调用")
+class Person(){
+    var name : String = _
+    var age : Int = _
 
-    // 声明辅助构造方法
-    def this(name:String){
-        this() // 直接调用主构造器
-        println("2. 辅助构造方法一被调用")
-        this.name = name
-        println(s"name:$name age:$age")
-    }
+    println("1. 父类的主构造器被调用")
 
     def this(name:String, age:Int){
-        this(name)
-        println(s"3. 辅助构造器方法二被调用")
+        this()
+        println("2. 父类的辅助构造器被调用")
+        this.name = name
         this.age = age
-        println(s"name:$name age:$age")
     }
 
-    def student(): Unit ={
-        println("不是构造方法，而是同名方法，只是方法名和类名一样")
+    def showInfo(): Unit = {
+        println(s"人物的年龄: $name, 年龄: $age")
+    }
+}
+
+class Student(name:String, age:Int) extends Person{
+    var stdNo:String = _
+    println("3. 子类的主构造器被调用")
+
+    def this(name:String, age:Int, stdNo:String){
+        this(name, age)
+        println("4. 子类的辅助构造器被调用")
+        this.stdNo = stdNo
     }
 
+    override def showInfo(): Unit ={
+        println(s"学生名字: $name, 年龄: $age, 学号: $stdNo")
+    }
 }
