@@ -1,45 +1,74 @@
 package com.stanlong.scala
 
 /**
- * 单例对象（伴生对象）
+ * 特质叠加
+ * 叠加特质声明顺序从左到右，方法执行顺序从右到左
  */
 object HelloScala {
+
     def main(args: Array[String]): Unit = {
-        val student1 = Student.getInstance()
-        student1.printInfo()
+        // 叠加特质声明顺序从左到右
 
-        val student2 = Student.getInstance()
-        student2.printInfo()
+        val mysql = new MySQL with DB with File // 先混入DB,在混入File
+        // 打印结果
+        /**
+         * 1. Data
+         * 2. DB
+         * 3. File
+         */
 
-        println(student1)
-        println(student2)
+        val mysql1 = new MySQL with File with DB // 先混入File,在混入DB
+        // 打印结果
+        /**
+         * 1. Data
+         * 3. File
+         * 2. DB
+         */
+
+        // Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+
+        mysql.insert(888)
+        // 打印结果
+        /**
+         * 3. 向文件
+         * 2 .向数据库
+         * 1. 插入数据 = 888
+         */
+
+        mysql1.insert(888)
+        // 打印结果
+        /**
+         * 2 .向数据库
+         * 3. 向文件
+         * 1. 插入数据 = 888
+         */
 
     }
 }
 
-class Student private (val name:String, val age:Int){ // 参数列表前加 private 修饰符表示主构造器被私有化
-    def printInfo(): Unit ={
-        println(s"student:name=${name} , age=${age}, school=${Student.school}")
+trait Operate {
+    def insert(id : Int)
+}
+trait Data extends Operate {
+    println("1. Data")
+    override  def insert(id : Int): Unit = {
+        println("1. 插入数据 = " + id)
     }
 }
-
-// 单例模式(饿汉式)
-// object Student{
-//     val school:String = "buaa"
-//     private val student: Student = new Student("zhangsan", 18)
-//     def getInstance():Student = student
-// }
-
-// 单例模式(饿汉式)
-object Student{
-    val school:String = "buaa"
-    private var student:Student = _
-    def getInstance():Student={
-        if(student == null){
-            // 如果没有对象实例，就创建一个
-            student = new Student("zhangsan", 18)
-        }
-        student
+trait DB extends Data {
+    println("2. DB")
+    override def insert(id : Int): Unit = {
+        println("2 .向数据库")
+        super.insert(id)
     }
 }
+trait File extends  Data {
+    println("3. File")
+    override def insert(id : Int): Unit = {
+        println("3. 向文件")
+        super.insert(id)
+    }
+}
+class MySQL {
 
+}

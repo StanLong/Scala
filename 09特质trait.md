@@ -1,84 +1,145 @@
 # 特质trait
 
-从面向对象来看，接口并不属于面向对象的范畴，Scala是纯面向对象的语言，在Scala中，没有接口。Scala语言中，采用特质trait（特征）来代替接口的概念，也就是说，多个类具有相同的特征（特征）时，就可以将这个特质（特征）独立出来，采用关键字trait声明。 理解trait 等价于(interface + abstract class)
+## 基本概念和用法
+
+Scala语言中，采用特质trait（特征）来代替接口的概念，也就是说，多个类具有相同的特质（特征）时，就可以将这个特质（特征）独立出来，采用关键字trait声明。 可以理解trait 等价于(interface + abstract class)
 
 ```scala
 package com.stanlong.scala
 
 /**
- * 特质 trait
+ * 特质
  */
-object Exercise01 {
+object HelloScala {
     def main(args: Array[String]): Unit = {
-        var con = new Console()
-        con.log("日志 2018-11-11 11:11:11")
+        val student = new Student
+        student.sayHello()
+        student.study()
+        student.dating()
+        student.play()
+
     }
 }
 
-trait Logger {
-    def log(msg: String)
-}
-// 所有的java接口都可以当做Scala特质使用
-// 说明
-// 1. class Console extends Logger with Cloneable with Serializable 中的 Serializable 是scala的trait
-// 2. Serializable 是scala的trait 继承了 java.io.Serializable接口
-// 看源码 trait Serializable extends Any with java.io.Serializable
-// 3. 所以我们说所有的java接口都可以当做Scala特质使用，因为是间接继承的.
-class Console extends Logger with Cloneable with Serializable {
-    def log(msg: String) {
-        println(msg)
+// 定义父类
+class Person{
+    val name: String ="person"
+    val age: Int = 18
+
+    def sayHello(): Unit ={
+        println("hello from: " + name)
     }
 }
+
+// 定义一个特质
+trait Young{
+    // 声明抽象和非抽象属性
+    val age: Int
+    val name:String="young"
+
+    // 声明抽象和非抽象方法
+    def play(): Unit ={
+        println("young people is playing")
+    }
+
+    def dating():Unit
+}
+
+class Student extends Person with Young{
+    // 重写冲突的属性
+    override val name: String = "student"
+
+    // 实现抽象方法
+    override def dating(): Unit = {
+        println(s"student $name is dating")
+    }
+
+    def study(): Unit ={
+        println(s"student $name is studying")
+    }
+
+    // 重写父类方法
+    override def sayHello(): Unit = {
+        super.sayHello()
+        println(s"hello from:student $name")
+    }
+}
+
+// 打印结果
+hello from: student
+hello from:student student
+student student is studying
+student student is dating
+young people is playing
 ```
 
-
+## 特质混入
 
 ```scala
 package com.stanlong.scala
 
 /**
- * 动态混入
- * 可在不修改类声明/定义的情况下，扩展类的功能
+ * 特质混入
+ * 优点: 在不修改类声明/定义的情况下，扩展类的功能
  */
-object Exercise01 {
+object HelloScala {
+
     def main(args: Array[String]): Unit = {
-        val oracleDB = new OracleDB with Operate
-        oracleDB.insert(100)
 
-        val mysqlDB = new MysqlDB with Operate
-        mysqlDB.insert(200)
-
-        // 抽象类中有抽象方法时，动态混入特质的写法
-        val hanaDB = new HanaDB with  Operate {
-            override def say(): Unit = {
-                println("Hana数据库")
+        val oracleDB = new OracleDB with Operate {
+            override def update(id: Int): Unit = { // 重写特质中的抽象方法，又叫动态混入
+                println(s"修改 oracle 记录id : $id")
             }
         }
-        hanaDB.insert(300)
+        oracleDB.getPrice(10000.00) 
+        oracleDB.insert(100)
+        oracleDB.update(100)
+
+        val hanaDB = new HanaDB with  Operate {
+            override def update(id: Int): Unit = {  // 重写特质中的抽象方法，又叫动态混入
+                println(s"修改 hana 记录 : $id")
+            }
+
+            override def say(): Unit = { // 抽象类混入特质时，需要实现抽象类中的抽象方法
+                println("这是Hana数据库")
+            }
+
+        }
+        hanaDB.insert(200)
+        hanaDB.update(200)
         hanaDB.say()
     }
 }
 
-trait Operate{
-    def insert(id:Int): Unit ={
-        println("插入数据 = " + id)
+class DB {
+    var name:String = _
+    def getPrice(price: Double): Unit ={
+        println(s"数据库的价格 : $price")
     }
-}
-
-class OracleDB{
 
 }
 
-abstract class MysqlDB{
+trait Operate{
+
+    def insert(id: Int): Unit ={
+        println("插入数据 " + id)
+    }
+
+    // 抽象方法
+    def update(id: Int): Unit
+}
+
+class OracleDB extends DB {
 
 }
+
 
 abstract class HanaDB{
     def say()
 }
 ```
 
-# 叠加特质
+## 特质叠加
 
 构建对象的同时如果混入多个特质，称之为叠加特质，叠加特质声明顺序从左到右，方法执行顺序从右到左
 
@@ -86,59 +147,71 @@ abstract class HanaDB{
 package com.stanlong.scala
 
 /**
- * 叠加特质
+ * 特质叠加
+ * 叠加特质声明顺序从左到右，方法执行顺序从右到左
  */
-object Exercise01 {
+object HelloScala {
+
     def main(args: Array[String]): Unit = {
-        // 同时混入多个特质，称之为叠加
-        // Scala在叠加特质的时候，会首先从后面的特质开始执行
-        // Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
-        val mysql = new MySQL with DB with File
-        // 修改在测试一下。。
-        //val mysql = new MySQL with File with DB
+        // 叠加特质声明顺序从左到右
 
-        // 向数据库插入数据
-        // 向文件插入数据
-        // 向文件向数据库插入数据
-        mysql.insert(888)
-
+        val mysql = new MySQL with DB with File // 先混入DB,在混入File
         // 打印结果
-        //Operate...
-        //Data
-        //DB
-        //File
-        //向文件
-        //向数据库
-        //插入数据 = 888
+        /**
+         * 1. Data
+         * 2. DB
+         * 3. File
+         */
+
+        val mysql1 = new MySQL with File with DB // 先混入File,在混入DB
+        // 打印结果
+        /**
+         * 1. Data
+         * 3. File
+         * 2. DB
+         */
+
+        // Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+
+        mysql.insert(888)
+        // 打印结果
+        /**
+         * 3. 向文件
+         * 2 .向数据库
+         * 1. 插入数据 = 888
+         */
+
+        mysql1.insert(888)
+        // 打印结果
+        /**
+         * 2 .向数据库
+         * 3. 向文件
+         * 1. 插入数据 = 888
+         */
 
     }
 }
 
 trait Operate {
-    println("Operate...")
     def insert(id : Int)
 }
 trait Data extends Operate {
-    println("Data")
+    println("1. Data")
     override  def insert(id : Int): Unit = {
-        println("插入数据 = " + id)
+        println("1. 插入数据 = " + id)
     }
 }
 trait DB extends Data {
-    println("DB")
+    println("2. DB")
     override def insert(id : Int): Unit = {
-        println("向数据库")
-        //Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
-        //这里就是找Data4的insert
+        println("2 .向数据库")
         super.insert(id)
     }
 }
 trait File extends  Data {
-    println("File")
+    println("3. File")
     override def insert(id : Int): Unit = {
-        println("向文件")
-        //Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
-        //这里就是找DB4的insert
+        println("3. 向文件")
         super.insert(id)
     }
 }
