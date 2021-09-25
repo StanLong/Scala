@@ -171,7 +171,7 @@ object HelloScala {
          * 2. DB
          */
 
-        // Scala中特质中如果调用super，并不是表示调用父特质的方法，而是向前面（左边）继续查找特质，如果找不到，才会去父特质查找
+        // Scala中特质中如果调用super，默认时从右向做查找特这，如果找不到，才会去父特质查找。如果想要直接调用指定类的特质，需要这么写 super[类名].方法
 
         mysql.insert(888)
         // 打印结果
@@ -213,12 +213,53 @@ trait File extends  Data {
     override def insert(id : Int): Unit = {
         println("3. 向文件")
         super.insert(id)
+        // super[Dta].insert(id)  直接调用父类的 insert 方法
     }
 }
 class MySQL {
 
 }
 ```
+
+## 自身类型
+
+自身类型可实现依赖注入的功能
+
+```scala
+package com.stanlong.scala
+
+/**
+ * 自身类型
+ * 实现依赖注入的功能
+ */
+object HelloScala {
+
+    def main(args: Array[String]): Unit = {
+        val user = new RegisterUser("zhangsan", "123456")
+        user.insert()
+    }
+}
+
+// 用户类
+class User(val name: String, val password: String)
+
+
+trait UserDao{
+    // UserDao 想要使用 User 里的属性，但是不想有继承关系，就可以把 User 定义为自身类型
+    _: User =>
+
+    def insert(): Unit ={
+        println(s"insert into db: ${this.name} ${this.password}") // 使用 this.属性 的方式访问自身类型
+    }
+}
+
+// 定义注册用户类
+class RegisterUser(name: String, password: String) extends User(name, password) with UserDao
+```
+
+
+
+
 
 # 在特质中重写抽象方法
 
@@ -397,48 +438,9 @@ class UnhappyException extends LoggedException{
 }
 ```
 
-# 自身类型
 
-自身类型：主要是为了解决特质的循环依赖问题，同时可以确保特质在不扩展某个类的情况下，依然可以做到限制混入该特质的类的类型。
 
-```scala
-package com.stanlong.scala
 
-/**
- * 扩展类的特质
- */
-object Exercise01 {
-    def main(args: Array[String]): Unit = {
-    }
-}
-
-//Logger就是自身类型特质
-trait Logger{
-    // 明确告诉编译器，我就是Exception,如果没有这句话，下面的getMessage不能调用
-    this: Exception =>
-    def log(): Unit ={
-        // 既然我就是Exception, 那么就可以调用其中的方法
-        println(getMessage)
-    }
-}
-
-//下面会报错 llegal inheritance, self-type Console does not conform to Exception
-//分析原因
-//1. Logger 已经是Exception了
-//2. 但是这里Console 并没有说明是Excepton的子类，因此出现了
-// self-type Console does not conform to Exception，即自身类型的约束。
-//class Console extends  Logger { //错误×
-//
-//}
-
-// 如果我们需要混入Logger这种自身类型的特质，需要让该类也继承Excetion
-// 这样Console 才能混入Logger,保证都是Excetpion类型
-
-// 此处必须继承Exception类，否则无法混入logger特质
-class Console extends Exception with Logger {
-
-}
-```
 
 
 
