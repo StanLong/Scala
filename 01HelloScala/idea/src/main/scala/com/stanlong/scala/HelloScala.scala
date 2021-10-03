@@ -1,36 +1,23 @@
 package com.stanlong.scala
 
 /**
- * 并行处理
+ * 对象匹配
+ * 针对对象实例的内容进行匹配使用样例类是最为简单快捷的， 不需要定义伴生对象并实行相关的方法
  */
 object HelloScala {
 
     def main(args: Array[String]): Unit = {
 
+        val student = new Student("zhangsan", 18)
 
-        //创建Stream
-        def numsForm(n: BigInt) : Stream[BigInt] = n #:: numsForm(n + 1)
-        val stream1 = numsForm(1)
-        println(stream1)
-
-        //再测试一个
-        val stream2 = numsForm(10)
-        println(stream2)
-
-
-        //head和tail
-        println("head=" + stream1.head) //1
-        println(stream1.tail) //Stream(2, ?)
-
-        println(stream1) //Stream(1, 2, ?)
-        println(stream1.tail.tail) //Stream(3, ?)
-        println(stream1) //Stream(1, 2, 3, ?)
-
-        // 使用map映射stream的元素并行进行计算
-        def multi(x:BigInt) : BigInt = {
-            x * x
+        // 针对对象实例的内容进行匹配
+        val result = student match {
+            case Student("zhangsan", 18) => "Alice, 18"
+            case _ => "Else"
         }
-        println(numsForm(5).map(multi)) //? (25,?)
-
+        println(result)
     }
 }
+
+// 定义样例类， 针对对象实例的内容进行匹配使用样例类是最为简单快捷的
+case class Student(val name: String, val age: Int)
