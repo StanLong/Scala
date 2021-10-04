@@ -1,12 +1,58 @@
 package com.stanlong.scala
 
 /**
- * 隐式转换
+ * 隐式函数
+ *     可以用作类型转换
+ * 隐式类
+ *    把构造方法定义成隐式的， 其他类型对象可直接调用
+ * 隐式参数
+ *    相当于定义了一个公共参数给所有方法调用，
  */
 object HelloScala {
 
     def main(args: Array[String]): Unit = {
 
+        val new12 = new MyRichInt(12)
+        println(new12.myMax(15))
 
+        // 1. 隐式函数
+        implicit def convert(num: Int): MyRichInt = new MyRichInt(num) // 入参为Int， 返回值类型为MyRichInt
+
+        println(12.myMax(15))
+
+        // 2. 隐式类， implicit 修饰的类只能放在对象或者当前类的内部
+        implicit class MyRichInt2(val self: Int) { // 把构造方法定义成隐式的
+            // 自定义比较大小的方法
+            def myMax2(n: Int): Int = if (n < self) self else n
+
+            def myMin2(n: Int): Int = if (n < self) n else self
+        }
+        println(12.myMin2(15))
+
+        // 3. 隐式参数
+        // 隐式参数名和方法的参数名不要求一样，因此在同一作用域：同类型，同名称隐式参数只能有一个
+        implicit val str: String ="zhangsan"
+        def sayHello()(implicit  name: String="zhangsan"):Unit={ // 这里用到了参数的柯里化， 隐式值会覆盖掉默认值的定义
+            println("hello, " + name)
+        }
+        def sayHi(implicit  name: String):Unit={ // 如果方法的()省略，则调用方法时()也必须省略
+            println("hi, " + name)
+        }
+        sayHello()
+        sayHi
+
+        // 隐式参数的简便写法
+        implicit val num:Int = 18
+        def hiAge():Unit={
+            println("hi, " + implicitly[Int]) // 调用Int类型的隐式参数
+        }
+        hiAge()
     }
+}
+
+// 自定义类
+class MyRichInt(val self: Int){
+    // 自定义比较大小的方法
+    def myMax(n: Int) : Int = if(n < self) self else n
+    def myMin(n: Int) : Int = if(n < self) n else self
 }
