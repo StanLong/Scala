@@ -1,45 +1,38 @@
 package com.stanlong.scala
 
-import scala.util.control.Breaks.{break, breakable}
 
 /**
- * 约瑟夫环
+ * 希尔排序
  */
 object ForDemo {
+
     def main(args: Array[String]): Unit = {
-
-
-
-
-    }
-
-    // 模拟内存中的节点
-    class Node(in_data:Int){
-        var data = this.in_data
-        var next:Node = null
-
-        override def toString: String = "Node[" + "data=" + data + "]"
-    }
-
-    // 双向链表
-    class CircleSingleLinkedList{
-        var headNode = null // 定义头指针作为环形链表的引子
-        // 新增
-        def add(nums: Int): Unit ={
-            var temp = null // 定义赋值指针，帮助遍历
-            for(i <- 1 until(nums)){
-
+        var array = Array[Int](84, 83, 88, 87, 61, 50, 70, 60, 80, 99)
+        var step:Int = Math.ceil(array.length / 2).toInt
+        var temp:Int = 0
+        var count:Int = 0
+        while (step>0){
+            count = count + 1
+            for(i <- step until(array.length)){
+                var j = i-step
+                while (j>=0){
+                    if(array(j) > array(j+step)){
+                        temp = array(j)
+                        array(j) = array(j+step)
+                        array(j+step) = temp
+                    }
+                    j = j-step
+                }
             }
-
+            println("第" + count + "次排序结果: " + array.mkString(","))
+            step = step / 2
         }
+        println("最终排序结果: " + array.mkString(","))
 
-        def show(): Unit ={
 
-        }
 
-        def out(): Unit ={
 
-        }
+
+
     }
-
 }
